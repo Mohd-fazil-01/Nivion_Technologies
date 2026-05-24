@@ -1,81 +1,199 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import logo from "../assets/LOGO.png";
-import { FaInstagram } from "react-icons/fa";
-import { FaTwitter } from "react-icons/fa";
-import { FaLinkedin } from "react-icons/fa";
+import { FaInstagram, FaTwitter, FaLinkedin, FaMapMarkerAlt, FaEnvelope } from "react-icons/fa";
+import gsap from "gsap";
 
 const Contact = () => {
+  const formRef = useRef(null);
+  const textRef = useRef(null);
+  const footerRef = useRef(null);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+    if (textRef.current) {
+      tl.fromTo(
+        textRef.current.children,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.15 }
+      );
+    }
+
+    if (formRef.current) {
+      tl.fromTo(
+        formRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.7 },
+        "-=0.3"
+      );
+    }
+
+    if (footerRef.current) {
+      tl.fromTo(
+        footerRef.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.6 },
+        "-=0.2"
+      );
+    }
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    alert("Thank you! Your message has been received. Our team will get in touch with you shortly.");
+  };
 
   return (
-    <section className="contact">
-      <div className="logo">
-        <img src={logo} alt="logo" />
-      </div>
-      <div className="contact-text">
-        <h1>Get In Touch with Us</h1>
-        <p>
-          Have questions or need AI solutions? Let us know by filling out the
-          form, and we’ll be in touch!{" "}
+    <section className="contact" style={{ marginTop: "40px" }}>
+      {/* HEADER SECTION */}
+      <div className="logo" ref={textRef}>
+        <img src={logo} alt="Nivion logo" />
+        <h1 style={{ marginTop: "15px" }}>Get In Touch</h1>
+        <p style={{ marginTop: "10px" }}>
+          Have a project in mind or need assistance integrating AI into your stack? 
+          Drop us a line and let's build something exceptional.
         </p>
       </div>
-      <div className="contact-form">
-        <form action="">
-          <div className="form-group">
-            <label>First Name</label>
-            <input type="text" 
-            name="First Name"
-            placeholder="Your Name" />
+
+      {/* TWO-COLUMN GRID */}
+      <div className="contact-grid-container">
+        {/* Left Side: Contact Form */}
+        <div className="contact-form" ref={formRef}>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="first-name">First Name</label>
+              <input 
+                type="text" 
+                id="first-name"
+                name="FirstName"
+                placeholder="Enter your first name" 
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="last-name">Last Name</label>
+              <input 
+                type="text" 
+                id="last-name"
+                name="LastName"
+                placeholder="Enter your last name" 
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input 
+                type="email" 
+                id="email"
+                name="email"
+                placeholder="Enter your email address" 
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="phone">Phone</label>
+              <input 
+                type="tel" 
+                id="phone"
+                name="phone"
+                placeholder="Enter your phone number" 
+              />
+            </div>
+
+            <div className="form-group full">
+              <label htmlFor="message">Message</label>
+              <textarea 
+                id="message"
+                name="message" 
+                placeholder="Tell us about your brand goals..." 
+                required
+              ></textarea>
+            </div>
+
+            <button type="submit" className="full">Send Message</button>
+          </form>
+        </div>
+
+        {/* Right Side: Map & Sidebar Info */}
+        <div className="contact-sidebar">
+          {/* Card Info */}
+          <div className="contact-card-info">
+            <div className="contact-card-item">
+              <span className="contact-card-icon">
+                <FaMapMarkerAlt />
+              </span>
+              <div className="contact-card-text">
+                <h4>Our Agency Location</h4>
+                <p>Afzalgarh, Bijnor, Uttar Pradesh, India</p>
+              </div>
+            </div>
+
+            <div className="contact-card-item">
+              <span className="contact-card-icon">
+                <FaEnvelope />
+              </span>
+              <div className="contact-card-text">
+                <h4>Email Address</h4>
+                <p>hello@nivion.tech</p>
+              </div>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Last Name</label>
-            <input type="text" 
-            name="Last Name"
-            placeholder="Last Name" />
+          {/* Interactive Google Map Embed */}
+          <div className="contact-map-box">
+            <iframe 
+              title="Afzalgarh Location Map"
+              src="https://maps.google.com/maps?q=Afzalgarh%20Bijnor%20Uttar%20Pradesh&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+              allowFullScreen="" 
+              loading="lazy"
+            ></iframe>
           </div>
-
-          <div className="form-group">
-            <label>Email</label>
-            <input type="email" 
-            name="email"
-            placeholder="Email Address" />
-          </div>
-
-          <div className="form-group">
-            <label>Phone</label>
-            <input type="number" 
-            name="phone"
-            placeholder="Phone Number" />
-          </div>
-
-          <div className="form-group full">
-            <label>Message</label>
-            <textarea name="message" placeholder="Type your message..."></textarea>
-          </div>
-
-          <button className="full">Submit</button>
-        </form>
+        </div>
       </div>
-      <div className="contact-info">
+
+      {/* FOOTER SOCIAL LINKS */}
+      <div className="contact-info" ref={footerRef}>
         <div className="logo">
           <span>
-            <FaInstagram  size={25}/>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }}>
+              <FaInstagram size={18} />
+            </a>
           </span>
           <span>
-            <FaTwitter size={25} />
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }}>
+              <FaTwitter size={18} />
+            </a>
           </span>
           <span>
-            <FaLinkedin  size={25}/>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }}>
+              <FaLinkedin size={18} />
+            </a>
           </span>
         </div>
+
         <div className="contact-link">
           <ul>
-            <li> Home </li>
-            <li> About Us </li>
-            <li> Services </li>
-            <li> Why Us </li>
-            <li> Privacy Policy </li>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/about">About Us</Link>
+            </li>
+            <li>
+              <Link to="/services">Services</Link>
+            </li>
+            <li>
+              <Link to="/portfolio">Portfolio</Link>
+            </li>
+            <li>
+              <Link to="/contact">Contact</Link>
+            </li>
           </ul>
         </div>
       </div>
