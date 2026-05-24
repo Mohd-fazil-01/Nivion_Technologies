@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import logo from "../assets/LOGO.png";
 import { FaInstagram, FaTwitter, FaLinkedin, FaMapMarkerAlt, FaEnvelope } from "react-icons/fa";
 import gsap from "gsap";
+import emailjs from "@emailjs/browser";
 
 const Contact = () => {
   const formRef = useRef(null);
   const textRef = useRef(null);
   const footerRef = useRef(null);
+  const formTagRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -43,7 +45,51 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Thank you! Your message has been received. Our team will get in touch with you shortly.");
+
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+
+    // Check if the user has replaced the placeholder template ID
+    if (!templateId || templateId === "your_template_id_here") {
+      alert("EmailJS Template ID is not configured yet! Please update 'VITE_EMAILJS_TEMPLATE_ID' inside your .env file with your actual EmailJS Template ID.");
+      return;
+    }
+
+    const submitBtn = e.target.querySelector("button[type='submit']");
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "Sending Message...";
+    submitBtn.disabled = true;
+
+    // Package all fields into a rich parameters object to match both standard and custom templates!
+    const templateParams = {
+      FirstName: e.target.FirstName.value,
+      LastName: e.target.LastName.value,
+      from_name: `${e.target.FirstName.value} ${e.target.LastName.value}`,
+      email: e.target.email.value,
+      reply_to: e.target.email.value,
+      phone: e.target.phone.value || "Not Provided",
+      message: e.target.message.value
+    };
+
+    emailjs.send(
+      serviceId,
+      templateId,
+      templateParams,
+      publicKey
+    )
+    .then(() => {
+      alert("Thank you! Your message has been sent successfully. Our team will get in touch with you shortly.");
+      formTagRef.current.reset();
+    })
+    .catch((error) => {
+      console.error("EmailJS Error:", error);
+      alert(`Failed to send message: ${error.text || "An unexpected error occurred"}. Please try again later or click the WhatsApp button to chat instantly!`);
+    })
+    .finally(() => {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
   };
 
   return (
@@ -62,7 +108,7 @@ const Contact = () => {
       <div className="contact-grid-container">
         {/* Left Side: Contact Form */}
         <div className="contact-form" ref={formRef}>
-          <form onSubmit={handleSubmit}>
+          <form ref={formTagRef} onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="first-name">First Name</label>
               <input 
