@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/LOGO.png";
 import { FaInstagram, FaTwitter, FaLinkedin, FaMapMarkerAlt, FaEnvelope } from "react-icons/fa";
@@ -10,6 +10,7 @@ const Contact = () => {
   const textRef = useRef(null);
   const footerRef = useRef(null);
   const formTagRef = useRef(null);
+  const [modal, setModal] = useState({ show: false, success: true, title: "", message: "" });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -52,7 +53,12 @@ const Contact = () => {
 
     // Check if the user has replaced the placeholder template ID
     if (!templateId || templateId === "your_template_id_here") {
-      alert("EmailJS Template ID is not configured yet! Please update 'VITE_EMAILJS_TEMPLATE_ID' inside your .env file with your actual EmailJS Template ID.");
+      setModal({
+        show: true,
+        success: false,
+        title: "Config Required",
+        message: "EmailJS Template ID is not configured yet! Please replace the placeholder 'VITE_EMAILJS_TEMPLATE_ID' inside your .env file with your actual EmailJS Template ID."
+      });
       return;
     }
 
@@ -79,12 +85,22 @@ const Contact = () => {
       publicKey
     )
     .then(() => {
-      alert("Thank you! Your message has been sent successfully. Our team will get in touch with you shortly.");
+      setModal({
+        show: true,
+        success: true,
+        title: "Message Sent!",
+        message: "Thank you! Your message has been sent successfully. We will get in touch with you shortly."
+      });
       formTagRef.current.reset();
     })
     .catch((error) => {
       console.error("EmailJS Error:", error);
-      alert(`Failed to send message: ${error.text || "An unexpected error occurred"}. Please try again later or click the WhatsApp button to chat instantly!`);
+      setModal({
+        show: true,
+        success: false,
+        title: "Delivery Failed",
+        message: `${error.text || "An unexpected error occurred"}. Please try again later or click the WhatsApp button to chat instantly!`
+      });
     })
     .finally(() => {
       submitBtn.textContent = originalText;
@@ -243,6 +259,22 @@ const Contact = () => {
           </ul>
         </div>
       </div>
+
+      {/* CUSTOM SUCCESS/ERROR NOTIFICATION MODAL */}
+      {modal.show && (
+        <div className="contact-modal-overlay" onClick={() => setModal({ ...modal, show: false })}>
+          <div className="contact-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className={`contact-modal-icon ${modal.success ? "success" : "error"}`}>
+              {modal.success ? "✔" : "✖"}
+            </div>
+            <h2>{modal.title}</h2>
+            <p>{modal.message}</p>
+            <button className="contact-modal-btn" onClick={() => setModal({ ...modal, show: false })}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
